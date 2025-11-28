@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { GameState } from './types';
-import LevelGrid from './components/LevelGrid';
-import GameSession from './components/GameSession';
+import LevelMap from './components/LevelMap';
+import GameLevel from './components/GameLevel';
 import { Play, RotateCcw, Share2, Award } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -45,7 +45,6 @@ export default function App() {
     setState(prev => {
       let newUnlocked = prev.unlockedLevel;
       // Default behavior: kembali ke map setelah menjawab (baik benar maupun salah)
-      // agar siswa bisa memilih untuk mengulang atau lanjut.
       let nextView: GameState['view'] = 'map'; 
 
       if (scoreDelta > 0) {
@@ -60,8 +59,7 @@ export default function App() {
             triggerVictoryConfetti();
         }
       } else {
-        // Jawaban Salah
-        // Tetap kembali ke map, tapi unlockedLevel tidak bertambah
+        // Jawaban Salah: Tetap kembali ke map, unlockedLevel tidak bertambah
       }
 
       return {
@@ -155,9 +153,8 @@ export default function App() {
 
   if (state.view === 'game') {
     return (
-      <GameSession 
-        // Key is crucial: it forces the component to remount cleanly if the user 
-        // plays the same level again, ensuring a new question is generated.
+      <GameLevel 
+        // Key ensures a fresh component instance for every level attempt
         key={`${state.currentLevel}-${state.score}`} 
         level={state.currentLevel} 
         onComplete={handleLevelComplete}
@@ -202,7 +199,7 @@ export default function App() {
   // Default: Level Map
   return (
     <>
-      <LevelGrid 
+      <LevelMap 
         unlockedLevel={state.unlockedLevel} 
         onSelectLevel={selectLevel} 
         onBack={() => setState(prev => ({ ...prev, view: 'home' }))}
